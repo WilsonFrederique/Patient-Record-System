@@ -1296,7 +1296,16 @@
                 if(document.querySelector('.multiple-text') && typeof Typed !== 'undefined') {
                     try {
                         var typed = new Typed('.multiple-text', {
-                            strings: ['une bibliothèque moderne', 'accessible à tous', 'amoureux du savoir', 'explorateurs de connaissances', 'guides vers la sagesse', 'curieux et inspirés', 'architectes de l’imaginaire et aussi', 'chercheurs de vérité'],
+                            strings: [
+                                'une équipe médicale dédiée',
+                                'à l’écoute des patients',
+                                'experts en soins personnalisés',
+                                'pionniers du suivi médical',
+                                'acteurs de votre bien-être',
+                                'organisés et réactifs',
+                                'engagés pour votre santé',
+                                'partenaires de votre guérison'
+                              ],
                             typeSpeed: 50,
                             backSpeed: 30,
                             startDelay: 500,
