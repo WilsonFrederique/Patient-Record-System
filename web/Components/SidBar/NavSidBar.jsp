@@ -1,3 +1,4 @@
+<%@page import="Bibliotheque.ServletRendezVous"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html lang="fr">
@@ -273,6 +274,7 @@
             <img class="Logo" src="/GestionPatient/images/Logo.png" alt="Avatar">
             <span class="text">GESTION PATIENT</span>
         </a>
+        <!--SidBar--> 
         <ul class="side-menu top">
             <li class="active">
                 <a href="/GestionPatient/index.jsp">
@@ -380,9 +382,16 @@
                 </a>
             </div>
             
-            <a href="#" class="notification">
-                <i class='bx bxs-bell' ></i>
-                <span class="num">8</span>
+            <a href="/GestionPatient/Components/Messages/indexMessages.jsp" class="notification">
+                <i class='bx bxs-bell'></i>
+                <%
+                    int pendingCount = ServletRendezVous.getPendingAppointmentsCount();
+                    if (pendingCount > 0) {
+                %>
+                    <span class="num"><%= pendingCount %></span>
+                <%
+                    }
+                %>
             </a>
 
             <!-- /////////////////////// PROFILE ////////////////////////// -->
