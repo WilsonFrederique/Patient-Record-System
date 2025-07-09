@@ -27,13 +27,13 @@ public class ServletRendezVous extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+        throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
         response.setCharacterEncoding("UTF-8");
 
         String action = request.getParameter("action");
         if (action == null) {
-            redirectWithError(request, response, "/Components/RendezVous/indexRendezVous.jsp", "action_non_specifiee");
+            redirectWithError(request, response, "/Components/Messages/indexMessages.jsp", "action_non_specifiee");
             return;
         }
 
@@ -44,8 +44,14 @@ public class ServletRendezVous extends HttpServlet {
             case "insert":
                 insertRendezVous(request, response);
                 break;
+            case "confirm":
+                confirmRendezVous(request, response);
+                break;
+            case "cancel":
+                cancelRendezVous(request, response);
+                break;
             default:
-                redirectWithError(request, response, "/Components/RendezVous/indexRendezVous.jsp", "action_invalide");
+                redirectWithError(request, response, "/Components/Messages/indexMessages.jsp", "action_invalide");
         }
     }
     
@@ -76,6 +82,74 @@ public class ServletRendezVous extends HttpServlet {
                 break;
             default:
                 redirectWithError(request, response, "/Components/RendezVous/indexRendezVous.jsp", "action_invalide");
+        }
+    }
+    
+    public static int getPendingAppointmentsCount() {
+        int count = 0;
+        try (Connection conn = DB_Connexion.getConnection()) {
+            String sql = "SELECT COUNT(*) AS total FROM rendezvous WHERE statut = 'en_attente'";
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                ResultSet rs = stmt.executeQuery();
+                if (rs.next()) {
+                    count = rs.getInt("total");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return count;
+    }
+    
+    private void confirmRendezVous(HttpServletRequest request, HttpServletResponse response) 
+        throws IOException, ServletException {
+        String idRdv = getTrimmedParameter(request, "idRdv");
+        if (idRdv.isEmpty()) {
+            redirectWithError(request, response, "/Components/Messages/indexMessages.jsp", "id_rdv_manquant");
+            return;
+        }
+
+        try (Connection conn = DB_Connexion.getConnection()) {
+            String sql = "UPDATE rendezvous SET statut='confirme' WHERE idRdv=?";
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setInt(1, Integer.parseInt(idRdv));
+                int rowsAffected = stmt.executeUpdate();
+
+                if (rowsAffected > 0) {
+                    redirectWithSuccess(request, response, "/Components/Messages/indexMessages.jsp", "confirm");
+                } else {
+                    redirectWithError(request, response, "/Components/Messages/indexMessages.jsp", "rendezvous_non_trouve");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            redirectWithError(request, response, "/Components/Messages/indexMessages.jsp", "connexion_bdd");
+        }
+    }
+
+    private void cancelRendezVous(HttpServletRequest request, HttpServletResponse response) 
+        throws IOException, ServletException {
+        String idRdv = getTrimmedParameter(request, "idRdv");
+        if (idRdv.isEmpty()) {
+            redirectWithError(request, response, "/Components/Messages/indexMessages.jsp", "id_rdv_manquant");
+            return;
+        }
+
+        try (Connection conn = DB_Connexion.getConnection()) {
+            String sql = "UPDATE rendezvous SET statut='annule' WHERE idRdv=?";
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setInt(1, Integer.parseInt(idRdv));
+                int rowsAffected = stmt.executeUpdate();
+
+                if (rowsAffected > 0) {
+                    redirectWithSuccess(request, response, "/Components/Messages/indexMessages.jsp", "cancel");
+                } else {
+                    redirectWithError(request, response, "/Components/Messages/indexMessages.jsp", "rendezvous_non_trouve");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            redirectWithError(request, response, "/Components/Messages/indexMessages.jsp", "connexion_bdd");
         }
     }
 
